@@ -17,6 +17,8 @@
 #include "HealthBar.h"
 #include "NetTPS.h"
 #include "Net/UnrealNetwork.h"
+#include "Components/HorizontalBox.h"
+#include "NetPlayerController.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -78,8 +80,12 @@ void ANetTPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitUIWidget();
-
+	if( IsLocallyControlled() && HasAuthority() == false )
+	{
+		// UI 위젯 초기화
+		InitUIWidget();
+	}
+	
 	// 총 검색
 	TArray<AActor*> allActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), allActors);
@@ -140,7 +146,7 @@ void ANetTPSCharacter::AttachPistol(AActor* pistolActor)
 void ANetTPSCharacter::ReleasePistol(const FInputActionValue& Value)
 {
 	// 총을 잡고 있지 않거나 재장전 중이라면 처리하지 않는다
-	if(bHasPistol == false || IsReloading )
+	if(bHasPistol == false || IsReloading || IsLocallyControlled() == false)
 	{
 		return;
 	}
@@ -172,21 +178,34 @@ void ANetTPSCharacter::Fire(const FInputActionValue& Value)
 }
 
 void ANetTPSCharacter::InitUIWidget()
-{
+{	
+	PRINTLOG(TEXT("[%s] Begin"), Controller ? TEXT("PLAYER") : TEXT("Not Player") );
+
 	// Player가 제어중이 아니라면 처리하지 않는다.
-	auto pc = Cast<APlayerController>(Controller);
+	auto pc = Cast<ANetPlayerController>(Controller);
 	if( pc == nullptr )
 	{
 		return;
 	}
-
-	if( mainUIWidget )
+	
+	if( pc->mainUIWidget )
 	{
-		mainUI = Cast<UMainUI>(CreateWidget(GetWorld(), mainUIWidget));
+		if( pc->mainUI == nullptr )
+		{
+			pc->mainUI = Cast<UMainUI>(CreateWidget(GetWorld(), pc->mainUIWidget));
+		}
+		mainUI = pc->mainUI;
+
 		mainUI->AddToViewport();
 		mainUI->ShowCrosshair(false);
 
+		hp = MaxHP;
+		mainUI->HP = 1.0f;
+
+		// 총알 모두 제거
+		mainUI->RemoveAllAmmo();
 		BulletCount = MaxBulletCount;
+
 		// 총알추가
 		for( int i = 0; i < MaxBulletCount; ++i )
 		{
@@ -224,6 +243,16 @@ void ANetTPSCharacter::InitAmmoUI()
 
 void ANetTPSCharacter::OnRep_HP()
 {
+	// 사망처리
+	if( HP <= 0 )
+	{
+		isDead = true;
+		ReleasePistol(FInputActionValue());
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetCharacterMovement()->DisableMovement();
+	}
+
 	// UI에 할당할 퍼센트 계산
 	float percent = hp / MaxHP;
 
@@ -232,6 +261,12 @@ void ANetTPSCharacter::OnRep_HP()
 		mainUI->HP = percent;
 		// 피격효과 처리
 		mainUI->PlayDamageAnimation();
+
+		if( damageCameraShake )
+		{
+			auto pc = Cast<APlayerController>(Controller);
+			pc->ClientStartCameraShake(damageCameraShake);
+		}
 	}
 	else
 	{
@@ -255,15 +290,35 @@ void ANetTPSCharacter::DamageProcess()
 {
 	// 체력을 감소시킨다.
 	HP--;
-
-	// 사망처리
-	if( HP <= 0 )
-	{
-		isDead = true;
-	}
 }
 
 
+
+void ANetTPSCharacter::DieProcess()
+{
+	auto pc = Cast<APlayerController>(Controller);
+	pc->SetShowMouseCursor(true);
+	GetFollowCamera()->PostProcessSettings.ColorSaturation = FVector4(0.0f, 0.0f, 0.0f, 1.0f);
+	
+	// Die UI 표시
+	if( mainUI )
+	{
+		mainUI->GameoverUI->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void ANetTPSCharacter::PossessedBy(AController* NewController)
+{
+	PRINTLOG(TEXT("Begin"));
+	Super::PossessedBy(NewController);
+
+	if( IsLocallyControlled() )
+	{
+		InitUIWidget();
+	}
+
+	PRINTLOG(TEXT("End"));
+}
 
 void ANetTPSCharacter::Tick(float DeltaSeconds)
 {

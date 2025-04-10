@@ -55,5 +55,12 @@ void UNetPlayerAnimInstance::AnimNotify_OnReloadFinish()
 	player->InitAmmoUI();
 }
 
+void UNetPlayerAnimInstance::AnimNotify_DieEnd()
+{
+	if( player && player->IsLocallyControlled() )
+	{
+		player->DieProcess();
+	}
+}
 
 

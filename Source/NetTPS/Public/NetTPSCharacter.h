@@ -100,8 +100,8 @@ public:
 
 
 	// 사용할 위젯클래스
-	UPROPERTY(EditDefaultsOnly, Category = UI)
-	TSubclassOf<class UMainUI> mainUIWidget;
+	//UPROPERTY(EditDefaultsOnly, Category = UI)
+	//TSubclassOf<class UMainUI> mainUIWidget;
 
 	// mainUIWidget 으로 부터 만들어진 인스턴스
 	UPROPERTY()
@@ -159,6 +159,17 @@ public:
 	// 사망여부
 	bool isDead = false;
 
+
+	// 카메라 셰이크
+	UPROPERTY(EditDefaultsOnly, Category = UI)
+	TSubclassOf<class UCameraShakeBase> damageCameraShake;
+
+
+	// 사망처리
+	void DieProcess();
+
+	// 이 함수는 서버에서만 호출이 된다
+	virtual void PossessedBy(AController* NewController) override;
 
 
 
@@ -222,6 +233,9 @@ public:
 	void ServerRPC_Reload();
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_Reload();
+
+
+
 
 
 };

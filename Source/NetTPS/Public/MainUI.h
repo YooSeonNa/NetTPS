@@ -50,4 +50,20 @@ public:
 	// 피격처리 애니메이션 재생
 	void PlayDamageAnimation();
 
+
+	UPROPERTY(BlueprintReadWrite, meta = ( BindWidget ))
+	class UHorizontalBox* GameoverUI;
+	UPROPERTY(BlueprintReadWrite, meta = ( BindWidget ))
+	class UButton*	btn_retry;
+	UPROPERTY(BlueprintReadWrite, meta = ( BindWidget ))
+	class UButton*	btn_exit;
+
+
+public:
+	virtual void NativeConstruct() override;
+
+	UFUNCTION()
+	void OnRetry();
+
+
 };

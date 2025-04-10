@@ -4,6 +4,9 @@
 #include "MainUI.h"
 #include "Components/Image.h"
 #include "Components/UniformGridPanel.h"
+#include "Components/Button.h"
+#include "Components/HorizontalBox.h"
+#include "NetPlayerController.h"
 
 void UMainUI::ShowCrosshair(bool isShow)
 {
@@ -39,4 +42,26 @@ void UMainUI::RemoveAllAmmo()
 void UMainUI::PlayDamageAnimation()
 {
 	PlayAnimation(DamageAnim);
+}
+
+
+
+void UMainUI::NativeConstruct()
+{
+	Super::NativeConstruct();
+	btn_retry->OnClicked.AddDynamic(this, &UMainUI::OnRetry);
+}
+
+void UMainUI::OnRetry()
+{
+	// 게임종료 UI 안보이도록 처리
+	GameoverUI->SetVisibility(ESlateVisibility::Hidden);
+	
+	auto pc = Cast<ANetPlayerController>(GetWorld()->GetFirstPlayerController());
+	if( pc )
+	{
+		// 마우스 커서 안보이도록 처리
+		pc->SetShowMouseCursor(false);
+		pc->ServerRPC_RespawnPlayer();
+	}
 }
