@@ -33,4 +33,10 @@ public:
 	// mainUIWidget 으로 부터 만들어진 인스턴스
 	UPROPERTY()
 	class UMainUI*	mainUI;
+
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_ChangeToSpectator();
+
+
 };

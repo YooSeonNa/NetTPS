@@ -62,6 +62,7 @@ void UMainUI::OnRetry()
 	{
 		// 마우스 커서 안보이도록 처리
 		pc->SetShowMouseCursor(false);
-		pc->ServerRPC_RespawnPlayer();
+		//pc->ServerRPC_RespawnPlayer();
+		pc->ServerRPC_ChangeToSpectator();
 	}
 }
