@@ -59,4 +59,9 @@ public:
 	void FindOtherSession();
 
 	void OnFindSessionsComplete(bool bWasSuccessful);
+
+
+	// 다국어 인코딩
+	FString StringBase64Encode(const FString& str);
+	FString StringBase64Decode(const FString& str);
 };
