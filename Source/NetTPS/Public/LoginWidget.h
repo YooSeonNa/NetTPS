@@ -40,5 +40,28 @@ public:
 	// Slider callback
 	UFUNCTION()
 	void OnValueChanged(float Value);
+
+	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
+	class UWidgetSwitcher* WidgetSwitcher;
+	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
+	class UButton* btn_createSession;
+	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
+	class UButton* btn_findSession;
+
+
+	UFUNCTION()
+	void SwitchCreatePanel();
+	UFUNCTION()
+	void SwitchFindPanel();
+
+	// 메인화면돌아가기 버튼
+	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
+	class UButton* btn_back;
+	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
+	class UButton* btn_back_1;
+
+	UFUNCTION()
+	void BackToMain();
+
 	
 };

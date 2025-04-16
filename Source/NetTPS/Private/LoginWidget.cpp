@@ -7,6 +7,7 @@
 #include "Components/Slider.h"
 #include "Components/TextBlock.h"
 #include "Components/EditableText.h"
+#include "Components/WidgetSwitcher.h"
 
 void ULoginWidget::NativeConstruct()
 {
@@ -16,7 +17,11 @@ void ULoginWidget::NativeConstruct()
 	btn_createRoom->OnClicked.AddDynamic(this, &ULoginWidget::CreateRoom);	
 	slider_playerCount->OnValueChanged.AddDynamic(this, &ULoginWidget::OnValueChanged);
 
+	btn_createSession->OnClicked.AddDynamic(this, &ULoginWidget::SwitchCreatePanel);
+	btn_findSession->OnClicked.AddDynamic(this, &ULoginWidget::SwitchFindPanel);
 
+	btn_back->OnClicked.AddDynamic(this, &ULoginWidget::BackToMain);
+	btn_back_1->OnClicked.AddDynamic(this, &ULoginWidget::BackToMain);
 }
 
 void ULoginWidget::CreateRoom()
@@ -32,4 +37,19 @@ void ULoginWidget::CreateRoom()
 void ULoginWidget::OnValueChanged(float Value)
 {
 	txt_playerCount->SetText(FText::AsNumber(Value));	
+}
+
+void ULoginWidget::SwitchCreatePanel()
+{
+	WidgetSwitcher->SetActiveWidgetIndex(1);	
+}
+
+void ULoginWidget::SwitchFindPanel()
+{
+	WidgetSwitcher->SetActiveWidgetIndex(2);
+}
+
+void ULoginWidget::BackToMain()
+{
+	WidgetSwitcher->SetActiveWidgetIndex(0);
 }
