@@ -8,12 +8,17 @@
 #include "Components/TextBlock.h"
 #include "Components/EditableText.h"
 #include "Components/WidgetSwitcher.h"
+#include "SessionSlotWidget.h"
+#include "Components/ScrollBox.h"
 
 void ULoginWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
 	gi = Cast<UNetGameInstance>(GetWorld()->GetGameInstance());
+	gi->onSearchCompleted.AddDynamic(this, &ULoginWidget::AddSlotWidget);
+	gi->onSearchState.AddDynamic(this, &ULoginWidget::OnChangeButtonEnable);
+
 	btn_createRoom->OnClicked.AddDynamic(this, &ULoginWidget::CreateRoom);	
 	slider_playerCount->OnValueChanged.AddDynamic(this, &ULoginWidget::OnValueChanged);
 
@@ -22,6 +27,8 @@ void ULoginWidget::NativeConstruct()
 
 	btn_back->OnClicked.AddDynamic(this, &ULoginWidget::BackToMain);
 	btn_back_1->OnClicked.AddDynamic(this, &ULoginWidget::BackToMain);
+
+	btn_find->OnClicked.AddDynamic(this, &ULoginWidget::OnClickedFindSession);
 }
 
 void ULoginWidget::CreateRoom()
@@ -47,9 +54,45 @@ void ULoginWidget::SwitchCreatePanel()
 void ULoginWidget::SwitchFindPanel()
 {
 	WidgetSwitcher->SetActiveWidgetIndex(2);
+	OnClickedFindSession();
 }
 
 void ULoginWidget::BackToMain()
 {
 	WidgetSwitcher->SetActiveWidgetIndex(0);
+}
+
+void ULoginWidget::OnClickedFindSession()
+{
+	// 기존 슬롯이 있다면 모두 지운다
+	scroll_roomList->ClearChildren();
+
+	if( gi != nullptr )
+	{
+		gi->FindOtherSession();
+	}
+}
+
+void ULoginWidget::OnChangeButtonEnable(bool bIsSearching)
+{
+	btn_find->SetIsEnabled(!bIsSearching);
+
+	if( bIsSearching == true )
+	{
+		// 검색중 보이도록 처리
+		txt_findingMsg->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		// 검색중 사라지도록 처리
+		txt_findingMsg->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+void ULoginWidget::AddSlotWidget(const struct FSessionInfo& sessionInfo)
+{
+	auto slot = CreateWidget<USessionSlotWidget>(this, sessionInfoWidget);
+	slot->Set(sessionInfo);
+	
+	scroll_roomList->AddChild(slot);
 }

@@ -63,5 +63,37 @@ public:
 	UFUNCTION()
 	void BackToMain();
 
+	// 방검색 버튼
+	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
+	class UButton* btn_find;
+
+	// 검색중 메시지
+	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
+	class UTextBlock*	txt_findingMsg;
+
+
+
+
+	// 방찾기 버튼 클릭시 호출될 콜백
+	UFUNCTION()
+	void OnClickedFindSession();
+
+	// 방찾기 상태 이벤트 콜백
+	UFUNCTION()
+	void OnChangeButtonEnable(bool bIsSearching);
+
+
+
+
+	// 세션슬롯
+	// Canvas_FindRoom 의 스크롤박스위젯
+	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
+	class UScrollBox* scroll_roomList;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class USessionSlotWidget> sessionInfoWidget;
+
+	UFUNCTION()
+	void AddSlotWidget(const struct FSessionInfo& sessionInfo);
 	
 };
