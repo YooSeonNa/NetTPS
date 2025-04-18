@@ -270,8 +270,14 @@ void ANetTPSCharacter::OnRep_HP()
 	}
 	else
 	{
-		auto hpUI = Cast<UHealthBar>(hpUIComp->GetWidget());
-		hpUI->HP = percent;
+		if( hpUIComp != nullptr )
+		{
+			auto hpUI = Cast<UHealthBar>(hpUIComp->GetWidget());
+			if( hpUI != nullptr )
+			{
+				hpUI->HP = percent;
+			}
+		}
 	}
 }
 
