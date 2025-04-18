@@ -4,6 +4,7 @@
 #include "SessionSlotWidget.h"
 #include "Components/TextBlock.h"
 #include "NetGameInstance.h"
+#include "Components/Button.h"
 
 void USessionSlotWidget::Set(const struct FSessionInfo& sessionInfo)
 {
@@ -13,4 +14,20 @@ void USessionSlotWidget::Set(const struct FSessionInfo& sessionInfo)
 	txt_pingSpeed->SetText(FText::FromString(FString::Printf(TEXT("%dms"), sessionInfo.pingSpeed)));
 
 	sessionNumber = sessionInfo.index;
+}
+
+void USessionSlotWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+	
+	btn_join->OnClicked.AddDynamic(this, &USessionSlotWidget::JoinSession);
+}
+
+void USessionSlotWidget::JoinSession()
+{
+	auto gi = Cast<UNetGameInstance>(GetWorld()->GetGameInstance());
+	if( gi != nullptr )
+	{
+		gi->JoinSelectedSession(sessionNumber);
+	}
 }

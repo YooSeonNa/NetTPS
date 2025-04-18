@@ -20,6 +20,10 @@ void UNetGameInstance::Init()
 
 		sessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UNetGameInstance::OnFindSessionsComplete);
 
+		sessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UNetGameInstance::OnJoinSessionCompleted);
+
+
+
 		/*
 		FTimerHandle handle;
 		GetWorld()->GetTimerManager().SetTimer(handle,
@@ -87,6 +91,11 @@ void UNetGameInstance::CreateMySession(FString roomName, int32 playerCount)
 void UNetGameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
 {
 	PRINTLOG(TEXT("SessionName : %s, bWasSuccessful : %d"), *SessionName.ToString(), bWasSuccessful);
+
+	if( bWasSuccessful == true )
+	{
+		GetWorld()->ServerTravel(TEXT("/Game/Net/Maps/BattleMap?listen"));
+	}
 }
 
 void UNetGameInstance::FindOtherSession()
@@ -193,6 +202,39 @@ void UNetGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 		PRINTLOG(TEXT("%s : %s(%s) - (%d/%d), %dms"), *roomName, *hostName, *userName, currentPlayerCount, maxPlayerCount, pingSpeed);
 	}
 	*/
+}
+
+void UNetGameInstance::JoinSelectedSession(int32 index)
+{
+	auto sr = sessionSearch->SearchResults;
+
+	// 이건 현재 언리얼 버그
+	sr[index].Session.SessionSettings.bUseLobbiesIfAvailable = true;
+	sr[index].Session.SessionSettings.bUsesPresence = true;
+
+	sessionInterface->JoinSession(0, FName(mySessionName), sr[index]);
+}
+
+void UNetGameInstance::OnJoinSessionCompleted(FName sessionName, EOnJoinSessionCompleteResult::Type result)
+{
+	if( result == EOnJoinSessionCompleteResult::Success )
+	{
+		auto pc = GetWorld()->GetFirstPlayerController();
+
+		FString url;
+		sessionInterface->GetResolvedConnectString(sessionName, url);
+
+		PRINTLOG(TEXT("Join URL : %s"), *url);
+
+		if( url.IsEmpty() == false )
+		{
+			pc->ClientTravel(url, ETravelType::TRAVEL_Absolute);			
+		}
+	}
+	else
+	{
+		PRINTLOG(TEXT("Join Session failed : %d"), result);
+	}
 }
 
 FString UNetGameInstance::StringBase64Encode(const FString& str)

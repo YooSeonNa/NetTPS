@@ -72,6 +72,22 @@ public:
 	FSearchStateSignature onSearchState;
 
 
+	// 세션(방) 입장
+	void JoinSelectedSession(int32 index);
+
+	// 세션입장 콜백
+	void OnJoinSessionCompleted(FName sessionName, EOnJoinSessionCompleteResult::Type result);
+
+
+
+
+
+
+
+
+
+
+
 	// 다국어 인코딩
 	FString StringBase64Encode(const FString& str);
 	FString StringBase64Decode(const FString& str);
