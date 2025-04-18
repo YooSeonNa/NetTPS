@@ -115,6 +115,16 @@ void ANetTPSCharacter::NotifyControllerChanged()
 	}
 }
 
+void ANetTPSCharacter::PostNetInit()
+{
+	Super::PostNetInit();
+
+	if( bHasPistol == true && ownedPistol != nullptr )
+	{
+		AttachPistol(ownedPistol);
+	}
+}
+
 void ANetTPSCharacter::TakePistol(const FInputActionValue& Value)
 {
 	// 총을 소유하고 있지 않다면 일정범위 안에 있는 총을 잡는다.
@@ -270,7 +280,7 @@ void ANetTPSCharacter::OnRep_HP()
 	}
 	else
 	{
-		if( hpUIComp != nullptr )
+		if( hpUIComp != nullptr && hpUIComp->GetWidget() != nullptr )
 		{
 			auto hpUI = Cast<UHealthBar>(hpUIComp->GetWidget());
 			if( hpUI != nullptr )
@@ -572,4 +582,5 @@ void ANetTPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(ANetTPSCharacter, bHasPistol);	
 	DOREPLIFETIME(ANetTPSCharacter, BulletCount);
 	DOREPLIFETIME(ANetTPSCharacter, hp);
+	DOREPLIFETIME(ANetTPSCharacter, ownedPistol);
 }

@@ -57,8 +57,9 @@ public:
 	bool bHasPistol = false;
 
 	// 소유중인 총
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	AActor* ownedPistol = nullptr;
+	virtual void PostNetInit() override;
 
 	// 총 검색 범위
 	UPROPERTY(EditAnywhere, Category = Gun)
