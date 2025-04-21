@@ -95,5 +95,10 @@ public:
 
 	UFUNCTION()
 	void AddSlotWidget(const struct FSessionInfo& sessionInfo);
+
+
+	// 사용자 이름
+	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
+	class UEditableText* edit_userName;
 	
 };

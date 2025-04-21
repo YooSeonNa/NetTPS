@@ -58,6 +58,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, meta = ( BindWidget ))
 	class UButton*	btn_exit;
 
+	// 사용자 목록
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UTextBlock*	txt_users;
+
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
 
 public:
 	virtual void NativeConstruct() override;

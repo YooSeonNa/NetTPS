@@ -7,6 +7,9 @@
 #include "Components/Button.h"
 #include "Components/HorizontalBox.h"
 #include "NetPlayerController.h"
+#include "GameFramework/PlayerState.h"
+#include "GameFramework/GameStateBase.h"
+#include "Components/TextBlock.h"
 
 void UMainUI::ShowCrosshair(bool isShow)
 {
@@ -45,6 +48,23 @@ void UMainUI::PlayDamageAnimation()
 }
 
 
+
+void UMainUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+	
+	// 플레이어 리스트 출력
+	TArray<APlayerState*> playerArr = GetWorld()->GetGameState()->PlayerArray;
+
+	FString name;
+
+	for(APlayerState* pState : playerArr)
+	{
+		name.Append(FString::Printf(TEXT("%s\n"), *pState->GetPlayerName()));		
+	}
+	
+	txt_users->SetText(FText::FromString(name));
+}
 
 void UMainUI::NativeConstruct()
 {
