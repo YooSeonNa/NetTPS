@@ -4,6 +4,7 @@
 #include "NetPlayerController.h"
 #include "NetTPSGameMode.h"
 #include "GameFramework/SpectatorPawn.h"
+#include "NetGameInstance.h"
 
 void ANetPlayerController::BeginPlay()
 {
@@ -12,6 +13,12 @@ void ANetPlayerController::BeginPlay()
 	if( HasAuthority() )
 	{
 		gm = Cast<ANetTPSGameMode>(GetWorld()->GetAuthGameMode());
+	}
+
+	if( IsLocalController() )
+	{
+		auto gi = Cast<UNetGameInstance>(GetWorld()->GetGameInstance());
+		ServerRPC_ChangePlayer(gi->bTypeA);
 	}
 }
 
@@ -47,5 +54,19 @@ void ANetPlayerController::ServerRPC_ChangeToSpectator_Implementation()
 		FTimerHandle handle;
 
 		GetWorldTimerManager().SetTimer(handle, this, &ANetPlayerController::ServerRPC_RespawnPlayer_Implementation, 5.0f, false);
+	}
+}
+
+void ANetPlayerController::ServerRPC_ChangePlayer_Implementation(bool bTypeA)
+{
+	// TypeA라면 Manny로 교체
+	if( bTypeA == false )
+	{
+		auto oldPawn = GetPawn();
+		UnPossess();
+		APawn* newPawn = GetWorld()->SpawnActor<APawn>(MannyFactory, oldPawn->GetActorTransform());
+		Possess(newPawn);
+
+		oldPawn->Destroy();
 	}
 }

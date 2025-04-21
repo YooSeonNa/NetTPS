@@ -29,6 +29,11 @@ void ULoginWidget::NativeConstruct()
 	btn_back_1->OnClicked.AddDynamic(this, &ULoginWidget::BackToMain);
 
 	btn_find->OnClicked.AddDynamic(this, &ULoginWidget::OnClickedFindSession);
+
+	Btn_TypeA->OnClicked.AddDynamic(this, &ULoginWidget::OnClickedTypeA);
+	Btn_TypeB->OnClicked.AddDynamic(this, &ULoginWidget::OnClickedTypeB);
+
+
 }
 
 void ULoginWidget::CreateRoom()
@@ -103,4 +108,14 @@ void ULoginWidget::AddSlotWidget(const struct FSessionInfo& sessionInfo)
 	slot->Set(sessionInfo);
 	
 	scroll_roomList->AddChild(slot);
+}
+
+void ULoginWidget::OnClickedTypeA()
+{
+	gi->bTypeA = true;
+}
+
+void ULoginWidget::OnClickedTypeB()
+{
+	gi->bTypeA = false;
 }

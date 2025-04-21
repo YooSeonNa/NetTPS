@@ -79,7 +79,7 @@ public:
 	void OnJoinSessionCompleted(FName sessionName, EOnJoinSessionCompleteResult::Type result);
 
 
-
+	bool bTypeA;
 
 
 

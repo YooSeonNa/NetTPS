@@ -100,5 +100,19 @@ public:
 	// 사용자 이름
 	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
 	class UEditableText* edit_userName;
+
+
+	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
+	class UButton*	Btn_TypeA;
+
+	UPROPERTY(BlueprintReadOnly, meta=(BindWidget))
+	class UButton*	Btn_TypeB;
+
+	UFUNCTION()
+	void OnClickedTypeA();
+
+	UFUNCTION()
+	void OnClickedTypeB();
+
 	
 };

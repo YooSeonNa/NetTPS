@@ -39,4 +39,15 @@ public:
 	void ServerRPC_ChangeToSpectator();
 
 
+
+	UPROPERTY(EditDefaultsOnly, Category = ChooseCharacter)
+	TSubclassOf<class APawn> MannyFactory;
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_ChangePlayer(bool bTypeA);
+
+
+
+
+
 };
