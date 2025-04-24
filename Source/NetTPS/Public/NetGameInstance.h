@@ -82,6 +82,19 @@ public:
 	bool bTypeA;
 
 
+	void ExitRoom();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_ExitRoom();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiRPC_ExitRoom();
+
+	void OnMyExitRoomComplete(FName sessionName, bool bWasSuccessful);
+
+
+
+	bool IsInRoom();
 
 
 

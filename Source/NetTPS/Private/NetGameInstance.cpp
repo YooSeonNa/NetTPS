@@ -21,6 +21,8 @@ void UNetGameInstance::Init()
 		sessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UNetGameInstance::OnFindSessionsComplete);
 
 		sessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UNetGameInstance::OnJoinSessionCompleted);
+
+		sessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UNetGameInstance::OnMyExitRoomComplete);
 		
 		mySessionName.Append(FString::Printf(TEXT("_%d_%d"), FMath::Rand32(), FDateTime::Now().GetMillisecond()));
 
@@ -235,6 +237,37 @@ void UNetGameInstance::OnJoinSessionCompleted(FName sessionName, EOnJoinSessionC
 	{
 		PRINTLOG(TEXT("Join Session failed : %d"), result);
 	}
+}
+
+void UNetGameInstance::ExitRoom()
+{
+	// 클라 영역
+	ServerRPC_ExitRoom();
+}
+
+void UNetGameInstance::ServerRPC_ExitRoom_Implementation()
+{
+	// 서버 영역
+	MultiRPC_ExitRoom();
+}
+
+void UNetGameInstance::MultiRPC_ExitRoom_Implementation()
+{
+	// 클라 영역 ( 서버/클라 )
+	sessionInterface->DestroySession(FName(*mySessionName));
+}
+
+void UNetGameInstance::OnMyExitRoomComplete(FName sessionName, bool bWasSuccessful)
+{
+	auto pc = GetWorld()->GetFirstPlayerController();
+	FString url = TEXT("/Game/Net/Maps/LobbyMap");
+	pc->ClientTravel(url, TRAVEL_Absolute);
+}
+
+bool UNetGameInstance::IsInRoom()
+{
+	FUniqueNetIdPtr netID = GetWorld()->GetFirstLocalPlayerFromController()->GetUniqueNetIdForPlatformUser().GetUniqueNetId();
+	return sessionInterface->IsPlayerInSession(FName(*mySessionName), *netID);
 }
 
 FString UNetGameInstance::StringBase64Encode(const FString& str)

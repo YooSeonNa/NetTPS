@@ -10,6 +10,7 @@
 #include "GameFramework/PlayerState.h"
 #include "GameFramework/GameStateBase.h"
 #include "Components/TextBlock.h"
+#include "NetGameInstance.h"
 
 void UMainUI::ShowCrosshair(bool isShow)
 {
@@ -60,7 +61,7 @@ void UMainUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
 	for(APlayerState* pState : playerArr)
 	{
-		name.Append(FString::Printf(TEXT("%s\n"), *pState->GetPlayerName()));		
+		name.Append(FString::Printf(TEXT("%s : %d\n"), *pState->GetPlayerName(), (int32)pState->GetScore()));		
 	}
 	
 	txt_users->SetText(FText::FromString(name));
@@ -70,6 +71,7 @@ void UMainUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 	btn_retry->OnClicked.AddDynamic(this, &UMainUI::OnRetry);
+	btn_exit->OnClicked.AddDynamic(this, &UMainUI::OnExit);
 }
 
 void UMainUI::OnRetry()
@@ -84,5 +86,14 @@ void UMainUI::OnRetry()
 		pc->SetShowMouseCursor(false);
 		//pc->ServerRPC_RespawnPlayer();
 		pc->ServerRPC_ChangeToSpectator();
+	}
+}
+
+void UMainUI::OnExit()
+{
+	auto gi = Cast<UNetGameInstance>(GetWorld()->GetGameInstance());
+	if( gi )
+	{
+		gi->ExitRoom();
 	}
 }

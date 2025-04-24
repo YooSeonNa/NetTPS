@@ -19,6 +19,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Components/HorizontalBox.h"
 #include "NetPlayerController.h"
+#include "NetPlayerState.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -490,6 +491,10 @@ void ANetTPSCharacter::ServerRPC_Fire_Implementation()
 		if( otherPlayer )
 		{
 			otherPlayer->DamageProcess();
+
+			// 스코어 처리
+			auto ps = Cast<ANetPlayerState>(GetPlayerState());
+			ps->SetScore(ps->GetScore() + 1);
 		}
 	}
 

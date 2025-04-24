@@ -18,6 +18,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:	
 	// Called every frame
@@ -63,6 +64,10 @@ public:
 	void ClientRPC_ChangeColor(const FLinearColor newColor);
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastRPC_ChangeColor(const FLinearColor newColor);
+
+
+	FTimerHandle handle;
+
 
 
 };

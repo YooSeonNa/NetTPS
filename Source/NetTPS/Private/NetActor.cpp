@@ -6,6 +6,7 @@
 #include "NetTPSCharacter.h"
 #include "EngineUtils.h"
 #include "Net/UnrealNetwork.h"
+#include "NetGameInstance.h"
 
 // Sets default values
 ANetActor::ANetActor()
@@ -32,9 +33,22 @@ void ANetActor::BeginPlay()
 
 	if( HasAuthority() )
 	{
+		auto gi = GetGameInstance<UNetGameInstance>();
+
+		GetWorld()->GetTimerManager().SetTimer(handle, [&, gi]()
+				{
+					if( gi->IsInRoom() )
+					{
+						ServerRPC_ChangeColor(FLinearColor::MakeRandomColor());
+					}					
+				}, 1, true);
+
+		/*
+		
+
 		FTimerHandle handle;
 
-		GetWorldTimerManager().SetTimer(handle,
+		GetWorld()->GetTimerManager().SetTimer(handle,
 		FTimerDelegate::CreateLambda([&]
 									{
 										FLinearColor MatColor = FLinearColor(FMath::RandRange(0.0f, 0.3f),
@@ -44,9 +58,15 @@ void ANetActor::BeginPlay()
 
 										//OnRep_ChangeMatColor();
 										ServerRPC_ChangeColor(MatColor);
-									}
+									 }
 								), 1, true );
+								*/
 	}	
+}
+
+void ANetActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	GetWorld()->GetTimerManager().ClearTimer(handle);
 }
 
 // Called every frame

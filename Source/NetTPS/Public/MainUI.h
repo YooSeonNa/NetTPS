@@ -72,4 +72,8 @@ public:
 	void OnRetry();
 
 
+	UFUNCTION()
+	void OnExit();
+
+
 };
