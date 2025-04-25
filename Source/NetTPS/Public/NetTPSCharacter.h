@@ -238,6 +238,21 @@ public:
 
 
 
+	// Voice Chat
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UInputAction*	VoiceAction;
+
+	void StartVoiceChat();
+	void StopVoiceChat();
+
+
+	// Chatting
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_SendMsg(const FString& msg);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiRPC_SendMsg(const FString& msg);
+
 
 };
 

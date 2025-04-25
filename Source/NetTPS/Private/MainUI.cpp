@@ -11,6 +11,10 @@
 #include "GameFramework/GameStateBase.h"
 #include "Components/TextBlock.h"
 #include "NetGameInstance.h"
+#include "NetTPSCharacter.h"
+#include "Components/EditableText.h"
+#include "ChatWidget.h"
+#include "Components/ScrollBox.h"
 
 void UMainUI::ShowCrosshair(bool isShow)
 {
@@ -72,6 +76,7 @@ void UMainUI::NativeConstruct()
 	Super::NativeConstruct();
 	btn_retry->OnClicked.AddDynamic(this, &UMainUI::OnRetry);
 	btn_exit->OnClicked.AddDynamic(this, &UMainUI::OnExit);
+	btn_send->OnClicked.AddDynamic(this, &UMainUI::SendMsg);
 }
 
 void UMainUI::OnRetry()
@@ -96,4 +101,30 @@ void UMainUI::OnExit()
 	{
 		gi->ExitRoom();
 	}
+}
+
+void UMainUI::SendMsg()
+{
+	FString msg = edit_input->GetText().ToString();
+	edit_input->SetText(FText::GetEmpty());
+	if( msg.IsEmpty() == true )	return;
+
+	auto pc = Cast<ANetPlayerController>(GetWorld()->GetFirstPlayerController());
+	if( pc )
+	{
+		auto player = Cast<ANetTPSCharacter>(pc->GetPawn());
+		if( player )
+		{
+			player->ServerRPC_SendMsg(msg);
+		}
+	}
+
+}
+
+void UMainUI::ReceiveMsg(const FString& msg)
+{
+	auto msgWidget = CreateWidget<UChatWidget>(GetWorld(), chatWidget);
+	msgWidget->txt_msg->SetText(FText::FromString(msg));
+	scroll_msgList->AddChild(msgWidget);
+	scroll_msgList->ScrollToEnd();
 }

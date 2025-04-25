@@ -76,4 +76,21 @@ public:
 	void OnExit();
 
 
+	// Chatting
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UChatWidget> chatWidget;
+	
+	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
+	class UScrollBox*	scroll_msgList;
+	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
+	class UEditableText*	edit_input;
+	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
+	class UButton*	btn_send;
+
+	UFUNCTION()
+	void SendMsg();
+
+	void ReceiveMsg(const FString& msg);
+
+
 };
